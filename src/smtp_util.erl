@@ -114,10 +114,15 @@ generate_message_boundary() ->
 
 -ifdef(deprecated_now).
 unique_id() ->
-    erlang:unique_integer().
+    try
+        crypto:strong_rand_bytes(16)
+    catch
+        _:_ ->
+            erlang:system_time(nano_seconds) + erlang:unique_integer([monotonic])
+    end.
 -else.
 unique_id() ->
-    erlang:now().
+    crypto:rand_bytes(16).
 -endif.
 
 -define(is_whitespace(Ch), (Ch =< 32)).
